@@ -1,0 +1,48 @@
+services:
+  go: &go
+    env_file:
+      - path: .env
+        required: false
+    tty: true
+    stdin_open: true
+    build:
+      context: .
+      target: deps
+    entrypoint: go
+    command: help
+    volumes:
+      - .:/usr/src/app:delegated
+      - gomod:/go/pkg/mod:cached
+      - ${LOCAL_DEP_PATH:-..}:/local
+
+  app:
+    <<: *go
+    command: run ./cmd/job/main.go
+    environment:
+      - LOG_LEVEL=debug
+      - CHECK_URL=https://raw.githubusercontent.com/open-telemetry/opentelemetry-collector-contrib/main/CHANGELOG.md
+    volumes:
+      - .:/usr/src/app:delegated
+      - gomod:/go/pkg/mod:cached
+      - ${LOCAL_DEP_PATH:-..}:/local
+      - ./mnt/cache:/mnt/cache
+
+  install:
+    <<: *go
+    profiles: [tasks]
+    command: mod tidy
+
+  lint:
+    <<: *go
+    profiles: [tasks]
+    command: vet ./...
+
+  test:
+    <<: *go
+    profiles: [tasks]
+    environment:
+      - LOG_LEVEL=debug
+    command: test ./...
+
+volumes:
+  gomod: {}
