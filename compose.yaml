@@ -25,7 +25,6 @@ services:
       - .:/usr/src/app:delegated
       - gomod:/go/pkg/mod:cached
       - ${LOCAL_DEP_PATH:-..}:/local
-      - ./mnt/cache:/mnt/cache
 
   install:
     <<: *go

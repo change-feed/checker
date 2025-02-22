@@ -34,6 +34,3 @@ compose.override.yaml
 
 # Ignore brew
 Brewfile.lock.json
-
-# Mounts
-/mnt/*
